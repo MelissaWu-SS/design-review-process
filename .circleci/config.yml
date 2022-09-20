@@ -10,13 +10,13 @@ orbs:
 jobs:
   build:
     docker:
-      - image: 'cimg/python:3.6'
+      - image: ghcr.io/silverstripeltd/bespoke-ci-base:4.0.0
     steps:
       - checkout
       # NPM Cache + Installation
       - restore_cache:
-        keys:
-          - v1-npm-deps-{{ checksum "yarn.lock" }}
+          keys:
+            - v1-npm-deps-{{ checksum "yarn.lock" }}
       - run: yarn install --frozen-lockfile
       - save_cache:
           paths:
