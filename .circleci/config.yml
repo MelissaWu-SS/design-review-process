@@ -2,25 +2,35 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+orbs:
+  aws-s3: circleci/aws-s3@3.0.0
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  build:
     docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+      - image: 'cimg/python:3.6'
     steps:
       - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+      - run: mkdir bucket && echo "lorem ipsum" > bucket/build_asset.txt
+      - aws-s3/sync:
+          arguments: |
+            --acl public-read \
+            --cache-control "max-age=86400"
+          aws-access-key-id: AWS_ACCESS_KEY_ID_BLUE
+          aws-region: AWS_REGION_BLUE
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_BLUE
+          from: bucket
+          to: 's3://design-review-process/prefix'
+      - aws-s3/copy:
+          arguments: '--dryrun'
+          from: bucket/build_asset.txt
+          to: 's3://design-review-process'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  s3-example:
     jobs:
-      - say-hello
+      - build
