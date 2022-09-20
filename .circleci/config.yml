@@ -13,7 +13,7 @@ jobs:
       - image: 'cimg/python:3.6'
     steps:
       - checkout
-      - run: mkdir bucket && echo "lorem ipsum" > bucket/build_asset.txt
+      - run: yarn build-storybook
       - aws-s3/sync:
           arguments: |
             --acl public-read \
@@ -21,11 +21,7 @@ jobs:
           aws-access-key-id: AWS_ACCESS_KEY_ID_BLUE
           aws-region: AWS_REGION_BLUE
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY_BLUE
-          from: bucket
-          to: 's3://design-review-process'
-      - aws-s3/copy:
-          arguments: '--dryrun'
-          from: bucket/build_asset.txt
+          from: deployed-storybook
           to: 's3://design-review-process'
 
 # Invoke jobs via workflows
