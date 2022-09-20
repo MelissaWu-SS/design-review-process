@@ -14,7 +14,7 @@ jobs:
     steps:
       - checkout
       # Set correct node version
-      - run: nvm install v18 && nvm alias default $(cat .nvmrc)
+      - run: nvm install v18
 
       # Update npm and yarn
       - run: npm install -g npm && npm install -g node-gyp && npm install -g yarn
