@@ -10,24 +10,9 @@ orbs:
 jobs:
   build:
     docker:
-      - image: ghcr.io/silverstripeltd/bespoke-ci-base:4.0.0
+      - image: 'cimg/python:3.6'
     steps:
       - checkout
-      # Set correct node version
-      - run: nvm install v18
-
-      # Update npm and yarn
-      - run: npm install -g npm && npm install -g node-gyp && npm install -g yarn
-      # NPM Cache + Installation
-      - restore_cache:
-          keys:
-            - v1-npm-deps-{{ checksum "yarn.lock" }}
-      - run: yarn install --frozen-lockfile
-      - save_cache:
-          paths:
-            - ./node_modules
-          key: v1-npm-deps-{{ checksum "yarn.lock" }}
-      # build storybook
       - run: yarn build-storybook
       - aws-s3/sync:
           arguments: |
